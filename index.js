@@ -10,6 +10,7 @@ class Publish {
   constructor (opts) {
     this.opts = (opts) ? opts : {}
     if (!opts.repo) opts.repo = this._getRepo()
+    if (!opts.tag) opts.tag = this._getTag()
     if (!opts.name) opts.name = opts.tag
     if (!opts.output) opts.output = opts.app + '.zip';
 
@@ -74,6 +75,12 @@ class Publish {
   // @TODO:
   // Get repo from package.json
   _getRepo () {
+    return null
+  }
+
+  // @TODO:
+  // Get tag (version) from package.json
+  _getTag () {
     return null
   }
 
