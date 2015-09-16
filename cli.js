@@ -9,8 +9,8 @@ const cli = meow({
     '  --tag  [Required] The git tag connected to the release, needs to be semver.',
     '  --app  [Required] The path to the .app to compress and upload.',
     '  --token  [Required] Github token to be able to publish the relase.',
+    '  --repo  [Required] The github repo in the following format: "username/reponame".',
     '  --name  The name of the relase',
-    '  --repo  The github repo in the following format: "username/reponame". Defaults to repo url in package.json',
     '  --output  The .zip output folder. Defaults to same folder as .app'
   ]
 })
