@@ -64,7 +64,9 @@ class Publish {
     return new Promise(function (resolve) {
       let file = fs.readFileAsync('./auto_updater.json').then(JSON.parse).then(function (content) {
         content.url = self._releaseUrl
-        fs.writeFileAsync('./auto_updater.json', JSON.stringify(content)).then(resolve())
+        fs.writeFileAsync('./auto_updater.json', JSON.stringify(content)).then(function () {
+          resolve()
+        })
       })
     })
   }
