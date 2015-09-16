@@ -1,8 +1,9 @@
 'use strict'
 const Zip = require('adm-zip')
 const publishRelease = require('publish-release')
-const fs = require('fs')
 const got = require('got')
+const Promise = require('bluebird')
+const fs = Promise.promisifyAll(require("fs"))
 
 class Publish {
 
@@ -22,38 +23,49 @@ class Publish {
 
   // Zip compress .app
   compress () {
-    let zip = new Zip()
-    zip.addLocalFile(this.opts.app)
-    zip.writeZip(this.opts.output)
+    let self = this;
+
+    return new Promise(function (resolve, reject) {
+      let zip = new Zip()
+      zip.addLocalFile(self.opts.app)
+      zip.writeZip(self.opts.output)
+      resolve()
+    })
   }
 
   // Create new release with zip as asset.
   release () {
     let self = this
 
-    publishRelease({
-      token: this.opts.token,
-      owner: this.opts.repo.split('/')[0],
-      repo: this.opts.repo.split('/')[1],
-      tag: this.opts.version,
-      name: this.opts.name,
-      assets: [this.opts.output]
-    }, function (err, release) {
-      if (!err) {
-        got(release.assets_url).then(function (res) {
-          var jsonBody = JSON.parse(res.body)
-          self._releaseUrl = jsonBody[0].browser_download_url
-        })
-      }
+    return new Promise(function (resolve, reject) {
+      publishRelease({
+        token: self.opts.token,
+        owner: self.opts.repo.split('/')[0],
+        repo: self.opts.repo.split('/')[1],
+        tag: self.opts.version,
+        name: self.opts.name,
+        assets: [self.opts.output]
+      }, function (err, release) {
+        if (!err) {
+          got(release.assets_url).then(function (res) {
+            var jsonBody = JSON.parse(res.body)
+            self._releaseUrl = jsonBody[0].browser_download_url
+            resolve()
+          })
+        }
+      })
     })
   }
 
   // Update auto_update.json file with latest url.
   updateAutoUpdater () {
-    let file = fs.readFileSync('./auto_updater.json')
-    let content = JSON.parse(file)
-    content.url = this._releaseUrl
-    fs.writeFileSync('./auto_updater.json', JSON.stringify(content))
+    let self = this
+    return new Promise(function (resolve) {
+      let file = fs.readFileAsync('./auto_updater.json').then(JSON.parse).then(function (content) {
+        content.url = self._releaseUrl
+        fs.writeFileAsync('./auto_updater.json', JSON.stringify(content)).then(resolve())
+      })
+    })
   }
 
   // @TODO:
