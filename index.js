@@ -10,10 +10,10 @@ class Publish {
   constructor (opts) {
     this.opts = (opts) ? opts : {}
     if (!opts.repo) opts.repo = this._getRepo()
-    if (!opts.name) opts.name = opts.version
+    if (!opts.name) opts.name = opts.tag
     if (!opts.output) opts.output = opts.app + '.zip';
 
-    if (!opts.version || !opts.repo || !opts.app) {
+    if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
       console.log('Missing options')
       process.exit()
     }
@@ -43,7 +43,7 @@ class Publish {
         token: self.opts.token,
         owner: self.opts.repo.split('/')[0],
         repo: self.opts.repo.split('/')[1],
-        tag: self.opts.version,
+        tag: self.opts.tag,
         name: self.opts.name,
         assets: [self.opts.output]
       }, function (err, release) {
