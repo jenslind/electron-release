@@ -19,8 +19,8 @@ var publish = new Publish(cli.flags)
 
 publish.compress()
   .then(function () {
-    publish.release()
+    return publish.release()
   })
   .then(function () {
-    publish.updateUrl()
+    return publish.updateUrl()
   })
