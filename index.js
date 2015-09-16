@@ -14,7 +14,7 @@ class Publish {
     if (!opts.output) opts.output = opts.app + '.zip';
 
     if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
-      console.log('Missing options')
+      console.log('Missing required options.')
       process.exit()
     }
 
