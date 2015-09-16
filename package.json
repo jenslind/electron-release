@@ -1,0 +1,25 @@
+{
+  "name": "electron-publish-release",
+  "version": "0.1.0",
+  "description": "Publish new releases to Github",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jenslind/electron-publish-release.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jenslind/electron-publish-release/issues"
+  },
+  "homepage": "https://github.com/jenslind/electron-publish-release",
+  "devDependencies": {
+    "standard": "^5.2.2"
+  },
+  "dependencies": {
+    "publish-release": "^1.1.0"
+  }
+}
