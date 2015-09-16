@@ -59,7 +59,7 @@ class Publish {
   }
 
   // Update auto_update.json file with latest url.
-  updateAutoUpdater () {
+  updateUrl () {
     let self = this
     return new Promise(function (resolve) {
       let file = fs.readFileAsync('./auto_updater.json').then(JSON.parse).then(function (content) {
