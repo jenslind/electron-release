@@ -28,8 +28,9 @@ class Publish {
     return new Promise(function (resolve, reject) {
       let zip = new Zip()
       zip.addLocalFile(self.opts.app)
-      zip.writeZip(self.opts.output)
-      resolve()
+      zip.writeZip(self.opts.output, function () {
+        resolve()
+      })
     })
   }
 
