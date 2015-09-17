@@ -72,10 +72,12 @@ class Publish {
     })
   }
 
-  // @TODO:
   // Get repo from package.json
   _getRepo () {
-    return null
+    let manifest = require('./package.json')
+    let url = manifest.repository.url.split('/')
+
+    return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '')
   }
 
   // @TODO:
