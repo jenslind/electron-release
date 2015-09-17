@@ -3,7 +3,7 @@ const exec = require('child_process').exec
 const publishRelease = require('publish-release')
 const got = require('got')
 const Promise = require('bluebird')
-const fs = Promise.promisifyAll(require("fs"))
+const fs = Promise.promisifyAll(require('fs'))
 
 class Publish {
 
@@ -12,7 +12,7 @@ class Publish {
     if (!opts.repo) opts.repo = this._getRepo()
     if (!opts.tag) opts.tag = this._getTag()
     if (!opts.name) opts.name = opts.tag
-    if (!opts.output) opts.output = opts.app + '.zip';
+    if (!opts.output) opts.output = opts.app + '.zip'
 
     if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
       console.log('Missing required options.')
@@ -24,7 +24,7 @@ class Publish {
 
   // Zip compress .app
   compress () {
-    let self = this;
+    let self = this
 
     return new Promise(function (resolve, reject) {
       let cmd = 'ditto -c -k --sequesterRsrc --keepParent ' + self.opts.app + ' ' + self.opts.output
@@ -64,7 +64,7 @@ class Publish {
   updateUrl () {
     let self = this
     return new Promise(function (resolve) {
-      let file = fs.readFileAsync('./auto_updater.json').then(JSON.parse).then(function (content) {
+      fs.readFileAsync('./auto_updater.json').then(JSON.parse).then(function (content) {
         content.url = self._releaseUrl
         fs.writeFileAsync('./auto_updater.json', JSON.stringify(content)).then(function () {
           resolve()
