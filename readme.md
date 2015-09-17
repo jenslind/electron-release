@@ -7,6 +7,12 @@
 npm install -g electron-publish-release
 ```
 
+## What it does
+
+1. Zip compress your `.app`
+2. Publish a new release on Github with the zip as an asset.
+3. Updates `auto_updater.json` with the new url.
+
 ## Usage
 
 ```
