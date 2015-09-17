@@ -4,7 +4,7 @@
   "description": "Publish a new release of your app to Github.",
   "main": "index.js",
   "bin": {
-    "electron-release": "cli.js"
+    "electron-publish-release": "cli.js"
   },
   "scripts": {
     "test": "standard"
