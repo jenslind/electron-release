@@ -1,5 +1,5 @@
 'use strict'
-const Zip = require('adm-zip')
+const exec = require('child_process').exec
 const publishRelease = require('publish-release')
 const got = require('got')
 const Promise = require('bluebird')
@@ -27,10 +27,11 @@ class Publish {
     let self = this;
 
     return new Promise(function (resolve, reject) {
-      let zip = new Zip()
-      zip.addLocalFile(self.opts.app)
-      zip.writeZip(self.opts.output, function () {
-        resolve()
+      let cmd = 'ditto -c -k --sequesterRsrc --keepParent ' + self.opts.app + ' ' + self.opts.output
+      exec(cmd, function (err) {
+        if (!err) {
+          resolve()
+        }
       })
     })
   }
