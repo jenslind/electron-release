@@ -11,7 +11,7 @@ npm install -g electron-publish-release
 
 ```
 Usage
-  $ electron-release
+  $ electron-publish-release
 Options
   --app  [Required] The path to the .app to compress and upload.
   --token  [Required] Github token to be able to publish the relase.
