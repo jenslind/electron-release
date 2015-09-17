@@ -3,7 +3,9 @@
 
 ## Install
 
-WIP
+```
+npm install -g electron-publish-release
+```
 
 ## Usage
 
