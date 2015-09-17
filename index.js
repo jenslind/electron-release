@@ -80,10 +80,12 @@ class Publish {
     return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '')
   }
 
-  // @TODO:
   // Get tag (version) from package.json
   _getTag () {
-    return null
+    let manifest = require('./package.json')
+    let version = manifest.version
+
+    return 'v' + version
   }
 
 }
