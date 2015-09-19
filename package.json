@@ -25,7 +25,9 @@
   "dependencies": {
     "bluebird": "^2.10.0",
     "got": "^4.2.0",
+    "load-json-file": "^1.0.1",
     "meow": "^3.3.0",
-    "publish-release": "^1.1.0"
+    "publish-release": "^1.1.0",
+    "write-json-file": "^1.1.1"
   }
 }

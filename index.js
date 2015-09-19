@@ -3,7 +3,8 @@ const exec = require('child_process').exec
 const publishRelease = require('publish-release')
 const got = require('got')
 const Promise = require('bluebird')
-const fs = Promise.promisifyAll(require('fs'))
+const loadJsonFile = require('load-json-file')
+const writeJsonFile = require('write-json-file')
 
 class Publish {
 
@@ -64,15 +65,11 @@ class Publish {
   updateUrl () {
     let self = this
     return new Promise(function (resolve) {
-      fs.statAsync('./auto_updater.json').then(function () {
-        fs.readFileAsync('./auto_updater.json').then(JSON.parse).then(function (content) {
-          content.url = self._releaseUrl
-          fs.writeFileAsync('./auto_updater.json', JSON.stringify(content)).then(function () {
-            resolve()
-          })
+      loadJsonFile('./auto_updater.json').then(function (content) {
+        content.url = self._releaseUrl
+        writeJsonFile('./auto_updater.json', content).then(function () {
+          resolve()
         })
-      }).catch(function () {
-        resolve()
       })
     })
   }
