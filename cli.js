@@ -4,7 +4,7 @@ const meow = require('meow')
 const cli = meow({
   help: [
     'Usage',
-    '  $ electron-publish-release',
+    '  $ electron-release',
     'Options',
     '  --app  [Required] The path to the .app to compress and upload.',
     '  --token  [Required] Github token to be able to publish the relase.',

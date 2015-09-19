@@ -1,24 +1,24 @@
 {
-  "name": "electron-publish-release",
+  "name": "electron-release",
   "version": "1.0.1",
   "description": "Publish a new release of your app to Github.",
   "main": "index.js",
   "bin": {
-    "electron-publish-release": "cli.js"
+    "electron-release": "cli.js"
   },
   "scripts": {
     "test": "standard"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jenslind/electron-publish-release.git"
+    "url": "https://github.com/jenslind/electron-release.git"
   },
   "author": "Jens Lind <jens@jensl.se> (jenslind.org)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jenslind/electron-publish-release/issues"
+    "url": "https://github.com/jenslind/electron-release/issues"
   },
-  "homepage": "https://github.com/jenslind/electron-publish-release",
+  "homepage": "https://github.com/jenslind/electron-release",
   "devDependencies": {
     "standard": "^5.2.2"
   },

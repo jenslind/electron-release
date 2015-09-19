@@ -4,7 +4,7 @@
 ## Install
 
 ```
-npm install -g electron-publish-release
+npm install -g electron-release
 ```
 
 ## What it does
@@ -17,7 +17,7 @@ npm install -g electron-publish-release
 
 ```
 Usage
-  $ electron-publish-release
+  $ electron-release
 Options
   --app  [Required] The path to the .app to compress and upload.
   --token  [Required] Github token to be able to publish the relase.
