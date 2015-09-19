@@ -1,5 +1,5 @@
 # Electron-publish-release [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
-> Publish a new release of your app to Github. Should be used togheter with: [electron-gh-releases](https://github.com/jenslind/electron-gh-releases).
+> Publish a new release of your app to Github. Could be used togheter with: [electron-gh-releases](https://github.com/jenslind/electron-gh-releases).
 
 ## Install
 
@@ -11,7 +11,7 @@ npm install -g electron-release
 
 1. Zip compress your `.app`
 2. Publish a new release on Github with the zip as an asset.
-3. Updates `auto_updater.json` with the new url.
+3. Updates `auto_updater.json` with the new url (if exists).
 
 ## Usage
 

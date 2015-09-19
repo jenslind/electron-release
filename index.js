@@ -64,11 +64,15 @@ class Publish {
   updateUrl () {
     let self = this
     return new Promise(function (resolve) {
-      fs.readFileAsync('./auto_updater.json').then(JSON.parse).then(function (content) {
-        content.url = self._releaseUrl
-        fs.writeFileAsync('./auto_updater.json', JSON.stringify(content)).then(function () {
-          resolve()
+      fs.statAsync('./auto_updater.json').then(function () {
+        fs.readFileAsync('./auto_updater.json').then(JSON.parse).then(function (content) {
+          content.url = self._releaseUrl
+          fs.writeFileAsync('./auto_updater.json', JSON.stringify(content)).then(function () {
+            resolve()
+          })
         })
+      }).catch(function () {
+        resolve()
       })
     })
   }
