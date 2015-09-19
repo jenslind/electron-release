@@ -1,6 +1,6 @@
 {
   "name": "electron-release",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Publish a new release of your app to Github.",
   "main": "index.js",
   "bin": {
