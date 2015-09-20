@@ -76,17 +76,15 @@ class Publish {
 
   // Get repo from package.json
   _getRepo () {
-    let manifest = require('./package.json')
-    let url = manifest.repository.url.split('/')
-
+    let pkg = loadJsonFile.sync('./package.json')
+    let url = pkg.repository.url.split('/')
     return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '')
   }
 
   // Get tag (version) from package.json
   _getTag () {
-    let manifest = require('./package.json')
-    let version = manifest.version
-
+    let pkg = loadJsonFile.sync('./package.json')
+    let version = pkg.version
     return 'v' + version
   }
 
