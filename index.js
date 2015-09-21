@@ -24,11 +24,6 @@ var Publish = (function () {
     if (!opts.name) opts.name = opts.tag;
     if (!opts.output) opts.output = opts.app + '.zip';
 
-    if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
-      console.log('Missing required options.');
-      process.exit();
-    }
-
     this._releaseUrl = null;
   }
 
@@ -44,6 +39,8 @@ var Publish = (function () {
         exec(cmd, function (err) {
           if (!err) {
             resolve();
+          } else {
+            reject(new Error('Unable to compress app.'));
           }
         });
       });
@@ -56,22 +53,26 @@ var Publish = (function () {
       var self = this;
 
       return new Promise(function (resolve, reject) {
-        publishRelease({
-          token: self.opts.token,
-          owner: self.opts.repo.split('/')[0],
-          repo: self.opts.repo.split('/')[1],
-          tag: self.opts.tag,
-          name: self.opts.name,
-          assets: [self.opts.output]
-        }, function (err, release) {
-          if (!err) {
-            got(release.assets_url).then(function (res) {
-              var jsonBody = JSON.parse(res.body);
-              self._releaseUrl = jsonBody[0].browser_download_url;
-              resolve();
-            });
-          }
-        });
+        try {
+          publishRelease({
+            token: self.opts.token,
+            owner: self.opts.repo.split('/')[0],
+            repo: self.opts.repo.split('/')[1],
+            tag: self.opts.tag,
+            name: self.opts.name,
+            assets: [self.opts.output]
+          }, function (err, release) {
+            if (!err) {
+              got(release.assets_url).then(function (res) {
+                var jsonBody = JSON.parse(res.body);
+                self._releaseUrl = jsonBody[0].browser_download_url;
+                resolve();
+              });
+            }
+          });
+        } catch (err) {
+          reject(new Error('Unable to create a new release on GitHub.'));
+        }
       });
     }
 
@@ -90,11 +91,23 @@ var Publish = (function () {
       });
     }
 
+    // Load package.json
+  }, {
+    key: '_loadPackageJson',
+    value: function _loadPackageJson() {
+      try {
+        return loadJsonFile.sync('./package.json');
+      } catch (err) {
+        return;
+      }
+    }
+
     // Get repo from package.json
   }, {
     key: '_getRepo',
     value: function _getRepo() {
-      var pkg = loadJsonFile.sync('./package.json');
+      var pkg = this._loadPackageJson();
+
       var url = pkg.repository.url.split('/');
       return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '');
     }
@@ -103,7 +116,8 @@ var Publish = (function () {
   }, {
     key: '_getTag',
     value: function _getTag() {
-      var pkg = loadJsonFile.sync('./package.json');
+      var pkg = this._loadPackageJson();
+
       var version = pkg.version;
       return 'v' + version;
     }

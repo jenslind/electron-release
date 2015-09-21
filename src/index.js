@@ -15,11 +15,6 @@ export default class Publish {
     if (!opts.name) opts.name = opts.tag
     if (!opts.output) opts.output = opts.app + '.zip'
 
-    if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
-      console.log('Missing required options.')
-      process.exit()
-    }
-
     this._releaseUrl = null
   }
 
@@ -32,6 +27,8 @@ export default class Publish {
       exec(cmd, function (err) {
         if (!err) {
           resolve()
+        } else {
+          reject(new Error('Unable to compress app.'))
         }
       })
     })
@@ -42,22 +39,26 @@ export default class Publish {
     let self = this
 
     return new Promise(function (resolve, reject) {
-      publishRelease({
-        token: self.opts.token,
-        owner: self.opts.repo.split('/')[0],
-        repo: self.opts.repo.split('/')[1],
-        tag: self.opts.tag,
-        name: self.opts.name,
-        assets: [self.opts.output]
-      }, function (err, release) {
-        if (!err) {
-          got(release.assets_url).then(function (res) {
-            var jsonBody = JSON.parse(res.body)
-            self._releaseUrl = jsonBody[0].browser_download_url
-            resolve()
-          })
-        }
-      })
+      try {
+        publishRelease({
+          token: self.opts.token,
+          owner: self.opts.repo.split('/')[0],
+          repo: self.opts.repo.split('/')[1],
+          tag: self.opts.tag,
+          name: self.opts.name,
+          assets: [self.opts.output]
+        }, function (err, release) {
+          if (!err) {
+            got(release.assets_url).then(function (res) {
+              var jsonBody = JSON.parse(res.body)
+              self._releaseUrl = jsonBody[0].browser_download_url
+              resolve()
+            })
+          }
+        })
+      } catch (err) {
+        reject(new Error('Unable to create a new release on GitHub.'))
+      }
     })
   }
 
@@ -74,16 +75,27 @@ export default class Publish {
     })
   }
 
+  // Load package.json
+  _loadPackageJson () {
+    try {
+      return loadJsonFile.sync('./package.json')
+    } catch (err) {
+      return
+    }
+  }
+
   // Get repo from package.json
   _getRepo () {
-    let pkg = loadJsonFile.sync('./package.json')
+    let pkg = this._loadPackageJson()
+
     let url = pkg.repository.url.split('/')
     return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '')
   }
 
   // Get tag (version) from package.json
   _getTag () {
-    let pkg = loadJsonFile.sync('./package.json')
+    let pkg = this._loadPackageJson()
+
     let version = pkg.version
     return 'v' + version
   }

@@ -16,11 +16,26 @@ const cli = meow({
   ]
 })
 
-var publish = new Publish(cli.flags)
+let opts = cli.flags
+
+var publish = new Publish(opts)
+
+if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
+  console.log('Missing required options.')
+  process.exit()
+}
 
 publish.compress()
+  .catch(function (err) {
+    console.log(err)
+    process.exit()
+  })
   .then(function () {
     return publish.release()
+  })
+  .catch(function (err) {
+    console.log(err)
+    process.exit()
   })
   .then(function () {
     return publish.updateUrl()
