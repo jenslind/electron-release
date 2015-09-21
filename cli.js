@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict'
 const Publish = require('./index')
 const meow = require('meow')
