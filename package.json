@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/jenslind/electron-release",
   "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.2.1",
     "standard": "^5.2.2"
   },
   "dependencies": {

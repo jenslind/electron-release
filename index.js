@@ -1,93 +1,116 @@
-'use strict'
-const exec = require('child_process').exec
-const publishRelease = require('publish-release')
-const got = require('got')
-const Promise = require('bluebird')
-const loadJsonFile = require('load-json-file')
-const writeJsonFile = require('write-json-file')
+'use strict';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-class Publish {
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-  constructor (opts) {
-    this.opts = (opts) ? opts : {}
-    if (!opts.repo) opts.repo = this._getRepo()
-    if (!opts.tag) opts.tag = this._getTag()
-    if (!opts.name) opts.name = opts.tag
-    if (!opts.output) opts.output = opts.app + '.zip'
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var exec = require('child_process').exec;
+var publishRelease = require('publish-release');
+var got = require('got');
+var Promise = require('bluebird');
+var loadJsonFile = require('load-json-file');
+var writeJsonFile = require('write-json-file');
+
+var Publish = (function () {
+  function Publish(opts) {
+    _classCallCheck(this, Publish);
+
+    this.opts = opts ? opts : {};
+    if (!opts.repo) opts.repo = this._getRepo();
+    if (!opts.tag) opts.tag = this._getTag();
+    if (!opts.name) opts.name = opts.tag;
+    if (!opts.output) opts.output = opts.app + '.zip';
 
     if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
-      console.log('Missing required options.')
-      process.exit()
+      console.log('Missing required options.');
+      process.exit();
     }
 
-    this._releaseUrl = null
+    this._releaseUrl = null;
   }
 
   // Zip compress .app
-  compress () {
-    let self = this
 
-    return new Promise(function (resolve, reject) {
-      let cmd = 'ditto -c -k --sequesterRsrc --keepParent ' + self.opts.app + ' ' + self.opts.output
-      exec(cmd, function (err) {
-        if (!err) {
-          resolve()
-        }
-      })
-    })
-  }
+  _createClass(Publish, [{
+    key: 'compress',
+    value: function compress() {
+      var self = this;
 
-  // Create new release with zip as asset.
-  release () {
-    let self = this
+      return new Promise(function (resolve, reject) {
+        var cmd = 'ditto -c -k --sequesterRsrc --keepParent ' + self.opts.app + ' ' + self.opts.output;
+        exec(cmd, function (err) {
+          if (!err) {
+            resolve();
+          }
+        });
+      });
+    }
 
-    return new Promise(function (resolve, reject) {
-      publishRelease({
-        token: self.opts.token,
-        owner: self.opts.repo.split('/')[0],
-        repo: self.opts.repo.split('/')[1],
-        tag: self.opts.tag,
-        name: self.opts.name,
-        assets: [self.opts.output]
-      }, function (err, release) {
-        if (!err) {
-          got(release.assets_url).then(function (res) {
-            var jsonBody = JSON.parse(res.body)
-            self._releaseUrl = jsonBody[0].browser_download_url
-            resolve()
-          })
-        }
-      })
-    })
-  }
+    // Create new release with zip as asset.
+  }, {
+    key: 'release',
+    value: function release() {
+      var self = this;
 
-  // Update auto_update.json file with latest url.
-  updateUrl () {
-    let self = this
-    return new Promise(function (resolve) {
-      loadJsonFile('./auto_updater.json').then(function (content) {
-        content.url = self._releaseUrl
-        writeJsonFile('./auto_updater.json', content).then(function () {
-          resolve()
-        })
-      })
-    })
-  }
+      return new Promise(function (resolve, reject) {
+        publishRelease({
+          token: self.opts.token,
+          owner: self.opts.repo.split('/')[0],
+          repo: self.opts.repo.split('/')[1],
+          tag: self.opts.tag,
+          name: self.opts.name,
+          assets: [self.opts.output]
+        }, function (err, release) {
+          if (!err) {
+            got(release.assets_url).then(function (res) {
+              var jsonBody = JSON.parse(res.body);
+              self._releaseUrl = jsonBody[0].browser_download_url;
+              resolve();
+            });
+          }
+        });
+      });
+    }
 
-  // Get repo from package.json
-  _getRepo () {
-    let pkg = loadJsonFile.sync('./package.json')
-    let url = pkg.repository.url.split('/')
-    return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '')
-  }
+    // Update auto_update.json file with latest url.
+  }, {
+    key: 'updateUrl',
+    value: function updateUrl() {
+      var self = this;
+      return new Promise(function (resolve) {
+        loadJsonFile('./auto_updater.json').then(function (content) {
+          content.url = self._releaseUrl;
+          writeJsonFile('./auto_updater.json', content).then(function () {
+            resolve();
+          });
+        });
+      });
+    }
 
-  // Get tag (version) from package.json
-  _getTag () {
-    let pkg = loadJsonFile.sync('./package.json')
-    let version = pkg.version
-    return 'v' + version
-  }
+    // Get repo from package.json
+  }, {
+    key: '_getRepo',
+    value: function _getRepo() {
+      var pkg = loadJsonFile.sync('./package.json');
+      var url = pkg.repository.url.split('/');
+      return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '');
+    }
 
-}
+    // Get tag (version) from package.json
+  }, {
+    key: '_getTag',
+    value: function _getTag() {
+      var pkg = loadJsonFile.sync('./package.json');
+      var version = pkg.version;
+      return 'v' + version;
+    }
+  }]);
 
-module.exports = Publish
+  return Publish;
+})();
+
+exports['default'] = Publish;
+module.exports = exports['default'];
