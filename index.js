@@ -13,6 +13,7 @@ var got = require('got');
 var Promise = require('bluebird');
 var loadJsonFile = require('load-json-file');
 var writeJsonFile = require('write-json-file');
+var path = require('path');
 
 var Publish = (function () {
   function Publish(opts) {
@@ -22,7 +23,7 @@ var Publish = (function () {
     if (!opts.repo) opts.repo = this._getRepo();
     if (!opts.tag) opts.tag = this._getTag();
     if (!opts.name) opts.name = opts.tag;
-    if (!opts.output) opts.output = opts.app + '.zip';
+    if (!opts.output) opts.output = opts.app;
 
     this._releaseUrl = null;
   }
@@ -34,15 +35,23 @@ var Publish = (function () {
     value: function compress() {
       var self = this;
 
+      if (!Array.isArray(self.opts.app)) self.opts.app = self.opts.app.replace(/ /g, '').split(',');
+      if (!Array.isArray(self.opts.output)) self.opts.output = self.opts.output.replace(/ /g, '').split(',');
+
       return new Promise(function (resolve, reject) {
-        var cmd = 'ditto -c -k --sequesterRsrc --keepParent ' + self.opts.app + ' ' + self.opts.output;
-        exec(cmd, function (err) {
-          if (!err) {
-            resolve();
-          } else {
-            reject(new Error('Unable to compress app.'));
-          }
-        });
+        if (self.opts.app.length !== self.opts.output.length) reject(new Error('Output length does not match app length'));
+
+        for (var i in self.opts.app) {
+          var output = path.extname(self.opts.output[i]) === '.zip' ? self.opts.output[i] : self.opts.output[i] + '.zip';
+          var cmd = 'ditto -c -k --sequesterRsrc --keepParent ' + self.opts.app[i] + ' ' + output;
+          exec(cmd, function (err) {
+            if (!err) {
+              resolve();
+            } else {
+              reject(new Error('Unable to compress app.'));
+            }
+          });
+        }
       });
     }
 
@@ -53,26 +62,24 @@ var Publish = (function () {
       var self = this;
 
       return new Promise(function (resolve, reject) {
-        try {
-          publishRelease({
-            token: self.opts.token,
-            owner: self.opts.repo.split('/')[0],
-            repo: self.opts.repo.split('/')[1],
-            tag: self.opts.tag,
-            name: self.opts.name,
-            assets: [self.opts.output]
-          }, function (err, release) {
-            if (!err) {
-              got(release.assets_url).then(function (res) {
-                var jsonBody = JSON.parse(res.body);
-                self._releaseUrl = jsonBody[0].browser_download_url;
-                resolve();
-              });
-            }
-          });
-        } catch (err) {
-          reject(new Error('Unable to create a new release on GitHub.'));
-        }
+        publishRelease({
+          token: self.opts.token,
+          owner: self.opts.repo.split('/')[0],
+          repo: self.opts.repo.split('/')[1],
+          tag: self.opts.tag,
+          name: self.opts.name,
+          assets: self.opts.output
+        }, function (err, release) {
+          if (!err) {
+            got(release.assets_url).then(function (res) {
+              var jsonBody = JSON.parse(res.body);
+              self._releaseUrl = jsonBody[0].browser_download_url;
+              resolve();
+            });
+          } else {
+            reject(new Error('Unable to create a new release on GitHub.'));
+          }
+        });
       });
     }
 
