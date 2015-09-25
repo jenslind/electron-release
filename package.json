@@ -22,6 +22,7 @@
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.1",
+    "gulp-watch": "^4.3.5",
     "standard": "^5.2.2"
   },
   "dependencies": {
