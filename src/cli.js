@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict'
 const Publish = require('./index')
+const chalk = require('chalk')
 const meow = require('meow')
 const cli = meow({
   help: [
@@ -27,16 +28,19 @@ if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
 
 publish.compress()
   .catch(function (err) {
-    console.log(err)
+    console.log(chalk.red(err))
     process.exit()
   })
   .then(function () {
     return publish.release()
   })
   .catch(function (err) {
-    console.log(err)
+    console.log(chalk.red(err))
     process.exit()
   })
   .then(function () {
     return publish.updateUrl()
+  })
+  .then(function () {
+    console.log(chalk.green('Published new release to GitHub (' + opts.tag + ')'))
   })

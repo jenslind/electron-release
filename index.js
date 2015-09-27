@@ -94,6 +94,8 @@ var Publish = (function () {
           writeJsonFile('./auto_updater.json', content).then(function () {
             resolve();
           });
+        })['catch'](function (err) {
+          resolve();
         });
       });
     }

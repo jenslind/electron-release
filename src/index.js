@@ -79,6 +79,9 @@ export default class Publish {
           resolve()
         })
       })
+      .catch(function (err) {
+        resolve()
+      })
     })
   }
 
