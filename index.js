@@ -1,139 +1,139 @@
 'use strict';
+
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
+exports.normalizeOptions = normalizeOptions;
+exports.compress = compress;
+exports.release = release;
+exports.updateUrl = updateUrl;
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+var _bluebird = require('bluebird');
 
-var exec = require('child_process').exec;
-var publishRelease = require('publish-release');
-var got = require('got');
-var Promise = require('bluebird');
-var loadJsonFile = require('load-json-file');
-var writeJsonFile = require('write-json-file');
-var path = require('path');
+var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var Publish = (function () {
-  function Publish(opts) {
-    _classCallCheck(this, Publish);
+var _child_process = require('child_process');
 
-    this.opts = opts ? opts : {};
-    if (!opts.repo) opts.repo = this._getRepo();
-    if (!opts.tag) opts.tag = this._getTag();
-    if (!opts.name) opts.name = opts.tag;
-    if (!opts.output) opts.output = opts.app;
+var _publishRelease = require('publish-release');
 
-    this._releaseUrl = null;
+var _publishRelease2 = _interopRequireDefault(_publishRelease);
+
+var _got = require('got');
+
+var _got2 = _interopRequireDefault(_got);
+
+var _loadJsonFile = require('load-json-file');
+
+var _loadJsonFile2 = _interopRequireDefault(_loadJsonFile);
+
+var _writeJsonFile = require('write-json-file');
+
+var _writeJsonFile2 = _interopRequireDefault(_writeJsonFile);
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var execAsync = _bluebird2['default'].promisify(_child_process.exec);
+var publishReleaseAsync = _bluebird2['default'].promisify(_publishRelease2['default']);
+
+function loadPackageJson() {
+  try {
+    return _loadJsonFile2['default'].sync('./package.json');
+  } catch (err) {
+    return;
+  }
+}
+
+function getRepo(pkg) {
+  var url = pkg.repository.url.split('/');
+  return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '');
+}
+
+function getTag(pkg) {
+  return 'v' + pkg.version;
+}
+
+function ensureArray(val) {
+  if (!Array.isArray(val)) {
+    return val.replace(/ /g, '').split(',');
   }
 
-  // Zip compress .app
+  return val;
+}
 
-  _createClass(Publish, [{
-    key: 'compress',
-    value: function compress() {
-      var self = this;
+function ensureZip(file) {
+  if (_path2['default'].extname(file) === '.zip') {
+    return file;
+  } else {
+    return file + '.zip';
+  }
+}
 
-      if (!Array.isArray(self.opts.app)) self.opts.app = self.opts.app.replace(/ /g, '').split(',');
-      if (!Array.isArray(self.opts.output)) self.opts.output = self.opts.output.replace(/ /g, '').split(',');
+function normalizeOptions() {
+  var opts = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-      return new Promise(function (resolve, reject) {
-        if (self.opts.app.length !== self.opts.output.length) reject(new Error('Output length does not match app length'));
+  var pkg = loadPackageJson();
 
-        for (var i in self.opts.app) {
-          var output = path.extname(self.opts.output[i]) === '.zip' ? self.opts.output[i] : self.opts.output[i] + '.zip';
-          var cmd = 'ditto -c -k --sequesterRsrc --keepParent ' + self.opts.app[i] + ' ' + output;
-          exec(cmd, function (err) {
-            if (!err) {
-              resolve();
-            } else {
-              reject(new Error('Unable to compress app.'));
-            }
-          });
-        }
-      });
-    }
+  if (!opts.repo) opts.repo = getRepo(pkg);
+  if (!opts.tag) opts.tag = getTag(pkg);
+  if (!opts.name) opts.name = opts.tag;
+  if (!opts.output) opts.output = opts.app;
 
-    // Create new release with zip as asset.
-  }, {
-    key: 'release',
-    value: function release() {
-      var self = this;
+  opts.app = ensureArray(opts.app);
+  opts.output = ensureArray(opts.output).map(function (file) {
+    return ensureZip(file);
+  });
 
-      return new Promise(function (resolve, reject) {
-        publishRelease({
-          token: self.opts.token,
-          owner: self.opts.repo.split('/')[0],
-          repo: self.opts.repo.split('/')[1],
-          tag: self.opts.tag,
-          name: self.opts.name,
-          assets: self.opts.output
-        }, function (err, release) {
-          if (!err) {
-            got(release.assets_url).then(function (res) {
-              var jsonBody = JSON.parse(res.body);
-              self._releaseUrl = jsonBody[0].browser_download_url;
-              resolve();
-            });
-          } else {
-            reject(new Error('Unable to create a new release on GitHub.'));
-          }
-        });
-      });
-    }
+  return opts;
+}
 
-    // Update auto_update.json file with latest url.
-  }, {
-    key: 'updateUrl',
-    value: function updateUrl() {
-      var self = this;
-      return new Promise(function (resolve) {
-        loadJsonFile('./auto_updater.json').then(function (content) {
-          content.url = self._releaseUrl;
-          writeJsonFile('./auto_updater.json', content).then(function () {
-            resolve();
-          });
-        })['catch'](function (err) {
-          resolve();
-        });
-      });
-    }
+function compress(_ref) {
+  var app = _ref.app;
+  var output = _ref.output;
 
-    // Load package.json
-  }, {
-    key: '_loadPackageJson',
-    value: function _loadPackageJson() {
-      try {
-        return loadJsonFile.sync('./package.json');
-      } catch (err) {
-        return;
-      }
-    }
+  if (app.length !== output.length) {
+    return _bluebird2['default'].reject(new Error('Output length does not match app length'));
+  }
 
-    // Get repo from package.json
-  }, {
-    key: '_getRepo',
-    value: function _getRepo() {
-      var pkg = this._loadPackageJson();
+  return _bluebird2['default'].resolve(app).map(function (item, i) {
+    var cmd = 'ditto -c -k --sequesterRsrc --keepParent ' + item + ' ' + output[i];
 
-      var url = pkg.repository.url.split('/');
-      return url[3] + '/' + url[4].replace(/\.[^/.]+$/, '');
-    }
+    return execAsync(cmd)['catch'](function () {
+      throw new Error('Unable to compress app.');
+    });
+  });
+}
 
-    // Get tag (version) from package.json
-  }, {
-    key: '_getTag',
-    value: function _getTag() {
-      var pkg = this._loadPackageJson();
+function release(_ref2) {
+  var token = _ref2.token;
+  var repo = _ref2.repo;
+  var tag = _ref2.tag;
+  var name = _ref2.name;
+  var output = _ref2.output;
 
-      var version = pkg.version;
-      return 'v' + version;
-    }
-  }]);
+  return publishReleaseAsync({
+    token: token, tag: tag, name: name,
+    owner: repo.split('/')[0],
+    repo: repo.split('/')[1],
+    assets: output
+  }).then(function (_ref3) {
+    var assets_url = _ref3.assets_url;
 
-  return Publish;
-})();
+    return (0, _got2['default'])(assets_url);
+  }).then(function (res) {
+    var jsonBody = JSON.parse(res.body);
+    return jsonBody[0].browser_download_url;
+  })['catch'](function () {
+    throw new Error('Unable to create a new release on GitHub.');
+  });
+}
 
-exports['default'] = Publish;
-module.exports = exports['default'];
+function updateUrl(releaseUrl) {
+  return (0, _loadJsonFile2['default'])('./auto_updater.json').then(function (content) {
+    content.url = releaseUrl;
+    return (0, _writeJsonFile2['default'])('./auto_updater.json', content);
+  })['catch'](function () {});
+}
