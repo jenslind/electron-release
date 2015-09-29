@@ -10,7 +10,7 @@ npm install -g electron-release
 ## What it does
 
 1. Zip compresses your `.app`
-2. Publishes a new release on Github with the zip as an asset.
+2. Publishes a new release on GitHub with the zip as an asset.
 3. Updates `auto_updater.json` with the new url (if exists).
 
 ## Usage
@@ -20,10 +20,10 @@ Usage
   $ electron-release
 Options
   --app  [Required] The path to the app to compress and upload, separate with `,` (--app=test.app,test.exe).
-  --token  [Required] Github token to be able to publish the relase.
+  --token  [Required] GitHub token to be able to publish the release.
   --tag  The git tag connected to the release, needs to be semver. Defaults to version in package.json
-  --repo  The github repo in the following format: "username/reponame". Defaults to repository.url in package.json
-  --name  The name of the relase. Defaults to --tag
+  --repo  The GitHub repo in the following format: "username/reponame". Defaults to repository.url in package.json
+  --name  The name of the release. Defaults to --tag
   --output  The .zip output folder. Defaults to same folder as app. separate with `,` (--output=test-app.zip,test-exe.zip).
 ```
 
