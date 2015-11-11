@@ -23,14 +23,12 @@ const cli = meow({
   ]
 })
 
-let opts = cli.flags
+const opts = normalizeOptions(cli.flags)
 
 if (!opts.tag || !opts.repo || !opts.app || !opts.token) {
   console.log('Missing required options.')
   process.exit()
 }
-
-opts = normalizeOptions(opts)
 
 Promise.resolve()
   .then(() => compress(opts))
