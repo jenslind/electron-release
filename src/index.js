@@ -43,6 +43,8 @@ function ensureZip (file) {
 }
 
 export function normalizeOptions (opts = {}) {
+  if (!opts.app || !opts.token) return opts
+
   let pkg = loadPackageJson()
 
   if (!opts.repo) opts.repo = getRepo(pkg)

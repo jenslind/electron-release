@@ -75,6 +75,8 @@ function ensureZip(file) {
 function normalizeOptions() {
   var opts = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
+  if (!opts.app || !opts.token) return opts;
+
   var pkg = loadPackageJson();
 
   if (!opts.repo) opts.repo = getRepo(pkg);
