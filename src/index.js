@@ -85,7 +85,8 @@ export function release ({ token, repo, tag, name, output }) {
   }).then(res => {
     let jsonBody = JSON.parse(res.body)
     return jsonBody[0].browser_download_url
-  }).catch(() => {
+  }).catch((err) => {
+    console.error(err)
     throw new Error('Unable to create a new release on GitHub.')
   })
 }

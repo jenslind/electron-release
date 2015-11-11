@@ -128,7 +128,8 @@ function release(_ref2) {
   }).then(function (res) {
     var jsonBody = JSON.parse(res.body);
     return jsonBody[0].browser_download_url;
-  })['catch'](function () {
+  })['catch'](function (err) {
+    console.error(err);
     throw new Error('Unable to create a new release on GitHub.');
   });
 }
