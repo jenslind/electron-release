@@ -1,3 +1,8 @@
+#Deprecated notice
+This project is no longer maintained. I suggest to use [electron-builder](https://github.com/electron-userland/electron-builder) instead. Which has support for uploading to GitHub.
+
+---
+
 # Electron-release [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard) [![Build Status](https://travis-ci.org/jenslind/electron-release.svg?branch=master)](https://travis-ci.org/jenslind/electron-release)
 > Publish a new release of your app to Github. Could be used together with: [electron-gh-releases](https://github.com/jenslind/electron-gh-releases).
 
